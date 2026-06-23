@@ -40,6 +40,7 @@ local hidden_combinator = {
 
 
 -- Inserter for indicating (with its filters) what kind combinator we are
+-- This is merely used for display in alt-mode
 local indicator_inserter = {
     type = "inserter",
     name = "recipe-combinator-component-indicator-inserter",
@@ -159,12 +160,12 @@ if feature_flags["spoiling"] then data:extend{
         type="recipe-category",
         name="recipe-combinator-spoilage-mechanic",
         hidden=true,
-        hidden_in_factoripedia=true
+        hidden_in_factoriopedia=true
     },
     {
         type="item",
         name="recipe-combinator-spoilage-mechanic",
-        hidden_in_factoripedia=true,
+        hidden_in_factoriopedia=true,
         icon = "__recipe_combinator__/graphics/compost-bin.png",
         stack_size=1,
         auto_recycle=false,
@@ -179,7 +180,7 @@ if feature_flags["spoiling"] then data:extend{
         crafting_speed=1,
         icon = "__recipe_combinator__/graphics/compost-bin.png",
         placeable_by = {item="recipe-combinator-spoilage-mechanic",count=1},
-        hidden_in_factoripedia=true,
+        hidden_in_factoriopedia=true,
         factoriopedia_description = {"factoriopedia-description.recipe-combinator-spoilage-mechanic"}
     }
 } end

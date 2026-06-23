@@ -1,3 +1,7 @@
+# Lord Recipe Combinator
+
+This is a drop-in replacement for Recipe Combinator that adds complete blueprint overlap and undo support. All modifications are released under the same MIT License as the original mod. The core features of the original Recipe Combinator remain the same. Original readme follows:
+
 # Recipe combinator
 
 This mod is intended for people who want to make automatic malls, which can craft small amounts of many different items using only a few machines.  It adds a new type of combinator which gives a wealth of information about recipes.  I made it because I didn't like wiring up a separate assembler in the mall just so that I could use "read ingredients".  Recipe combinators can also give more information than "read ingredients", such as supported modules, crafting time, output quantity and so on.
@@ -26,7 +30,6 @@ Features:
 
 Known issues:
 
-* When changing combinator settings by pasting a blueprint over them, if the blueprint snaps to a grid, then the affected entities are not always calculated correctly.
 * When asking for all recipes that produce a normal fluid output, only normal-quality recipes are shown.  This should probably be the default behavior anyway, but maybe there should be a checkbox to show all qualities.
 * The combinator's calculations do not take productivity (whether from the machine, modules or research) into account.
 * The combinator's calculations do not take randomized outputs into account.
