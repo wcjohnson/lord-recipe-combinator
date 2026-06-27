@@ -88,10 +88,10 @@ local recipe_combinator = util.merge{data.raw["arithmetic-combinator"]["arithmet
     minable = {mining_time = 0.5, result = "recipe-combinator-main"},
     placeable_by = {item="recipe-combinator-main",count=1},
     plus_symbol_sprites = {
-        north={filename="__recipe_combinator__/graphics/rled.png",x=0},
-        south={filename="__recipe_combinator__/graphics/rled.png",x=0},
-        east={filename="__recipe_combinator__/graphics/rled.png",x=0},
-        west={filename="__recipe_combinator__/graphics/rled.png",x=0}
+        north={filename="__lord-recipe-combinator__/graphics/rled.png",x=0},
+        south={filename="__lord-recipe-combinator__/graphics/rled.png",x=0},
+        east={filename="__lord-recipe-combinator__/graphics/rled.png",x=0},
+        west={filename="__lord-recipe-combinator__/graphics/rled.png",x=0}
     },
     sprites =  make_4way_animation_from_spritesheet{
         layers = {
@@ -166,7 +166,7 @@ if feature_flags["spoiling"] then data:extend{
         type="item",
         name="recipe-combinator-spoilage-mechanic",
         hidden_in_factoriopedia=true,
-        icon = "__recipe_combinator__/graphics/compost-bin.png",
+        icon = "__lord-recipe-combinator__/graphics/compost-bin.png",
         stack_size=1,
         auto_recycle=false,
         place_result="recipe-combinator-spoilage-mechanic"
@@ -178,7 +178,7 @@ if feature_flags["spoiling"] then data:extend{
         energy_usage="1J",
         energy_source={type="void"},
         crafting_speed=1,
-        icon = "__recipe_combinator__/graphics/compost-bin.png",
+        icon = "__lord-recipe-combinator__/graphics/compost-bin.png",
         placeable_by = {item="recipe-combinator-spoilage-mechanic",count=1},
         hidden_in_factoriopedia=true,
         factoriopedia_description = {"factoriopedia-description.recipe-combinator-spoilage-mechanic"}
