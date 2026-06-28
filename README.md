@@ -1,6 +1,6 @@
 # Lord Recipe Combinator
 
-This is a drop-in replacement for Recipe Combinator that adds complete blueprint overlap and undo support. All modifications are released under the same MIT License as the original mod. The core features of the original Recipe Combinator remain the same. Original readme follows:
+This is a version of the Recipe Combinator that adds complete blueprint overlap and undo support. All modifications are released under the same MIT License as the original mod. All credit for the core mod goes to the original author, @bitwiseshiftleft. The core features of the original Recipe Combinator remain the same. Original readme follows:
 
 # Recipe combinator
 
