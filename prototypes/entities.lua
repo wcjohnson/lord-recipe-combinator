@@ -154,33 +154,3 @@ data:extend{
     },
     recipe_combinator
 }
-
-if feature_flags["spoiling"] then data:extend{
-    {
-        type="recipe-category",
-        name="recipe-combinator-spoilage-mechanic",
-        hidden=true,
-        hidden_in_factoriopedia=true
-    },
-    {
-        type="item",
-        name="recipe-combinator-spoilage-mechanic",
-        hidden_in_factoriopedia=true,
-        icon = "__lord-recipe-combinator__/graphics/compost-bin.png",
-        stack_size=1,
-        auto_recycle=false,
-        place_result="recipe-combinator-spoilage-mechanic"
-    },
-    {
-        type="assembling-machine",
-        name="recipe-combinator-spoilage-mechanic",
-        crafting_categories={"recipe-combinator-spoilage-mechanic"},
-        energy_usage="1J",
-        energy_source={type="void"},
-        crafting_speed=1,
-        icon = "__lord-recipe-combinator__/graphics/compost-bin.png",
-        placeable_by = {item="recipe-combinator-spoilage-mechanic",count=1},
-        hidden_in_factoriopedia=true,
-        factoriopedia_description = {"factoriopedia-description.recipe-combinator-spoilage-mechanic"}
-    }
-} end

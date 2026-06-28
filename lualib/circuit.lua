@@ -341,26 +341,7 @@ end
 
 local g_spoilage_cache=nil
 local function cache_spoilage()
-  if g_spoilage_cache or not script.feature_flags.spoiling then
-    g_spoilage_cache = {}
-    return
-  end
   g_spoilage_cache = {}
-  for name,item in pairs(prototypes.item) do
-    local ticks = item.get_spoil_ticks()
-    if ticks > 0 then
-      g_spoilage_cache[name] = {
-        name="spoil:"..name,
-        ingredients={{name=name,type="item",amount=1}},
-        products=item.spoil_result
-          and {{name=item.spoil_result.name,type="item",amount=1}}
-          or {},
-        energy=ticks/60.,
-        allowed_module_categories={},
-        category="recipe-combinator-spoilage-mechanic"
-      }
-    end
-  end
 end
 
 local function init()
@@ -1047,12 +1028,9 @@ local function build_recipe_info_combinator(args)
     local machine_proto=category_to_machine_proto[category]
     local machine_has_modules = machine_proto.module_inventory_size and (machine_proto.module_inventory_size>0)
     local recipes,is_spoilage
-    if category == "recipe-combinator-spoilage-mechanic" then
-      recipes = g_spoilage_cache
-      is_spoilage = true
-    else
+
       recipes = prototypes.get_recipe_filtered{{filter="category",category=category}}
-    end
+
     for name,recipe in pairs(recipes) do
       local suitable =
         string.find(name,"^parameter%-%d$") == nil

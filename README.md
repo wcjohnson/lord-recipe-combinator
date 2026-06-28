@@ -1,6 +1,6 @@
 # Lord Recipe Combinator
 
-This is a version of the Recipe Combinator that adds complete blueprint overlap and undo support. All modifications are released under the same MIT License as the original mod. All credit for the core mod goes to the original author, @bitwiseshiftleft. The core features of the original Recipe Combinator remain the same. Original readme follows:
+This is a version of the Recipe Combinator that adds complete blueprint overlap and undo support. All modifications are released under the same MIT License as the original mod. All credit for the core mod goes to the original author, @bitwiseshiftleft. Original readme follows:
 
 # Recipe combinator
 
@@ -26,7 +26,6 @@ Features:
 * Output all recipes supported by a certain machine, or all recipes that produce a certain product.
 * Outputs can be on red or green wires, and can be optionally negated or multiplied by the input.
 * Supports quality.
-* Partially supports getting info on spoilage time and products.  To do this, select "spoilage mechanic" from the machines panel.
 
 Known issues:
 
