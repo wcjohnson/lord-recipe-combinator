@@ -218,6 +218,8 @@ local combinator_registration = {
 	initial_tags_callback = { "lord-recipe-combinator", "initial_tags" },
 	custom_events = {
 		on_tags_changed = "lord-recipe-combinator-on_tags_changed",
+		on_initialized = "lord-recipe-combinator-on_initialized",
+		on_status = "lord-recipe-combinator-on_status",
 	},
 }
 things_registration.register(combinator_registration)

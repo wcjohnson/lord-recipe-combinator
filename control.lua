@@ -104,6 +104,8 @@ local function destroy_children(thing_id)
 	strace.debug(
 		"lord-recipe-combinator.destroy_children destroyed",
 		n_destroyed,
+		"/",
+		#children,
 		"children of thing",
 		thing_id
 	)

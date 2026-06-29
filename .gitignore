@@ -1,3 +1,4 @@
 .luarc.json
 .vscode/settings.json
 .emmyrc.json
+.vscode/launch.json

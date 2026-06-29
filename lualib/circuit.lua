@@ -105,6 +105,7 @@ function Builder:make_combi(args)
 	--   a regular combinator if args.visible, ando otherwise a hidden one
 	-- Set the combinator description according to args.description.
 	-----------------------------------------------------------------------
+	local name
 	if args.arithmetic then
 		name = args.combinator_name
 			or (args.visible and "arithmetic-combinator")
@@ -273,7 +274,7 @@ local function build_flag_matrix(builder, input, rows, prefix)
 	local bitno = {}
 
 	for _idx, row in ipairs(rows) do
-		rowsig, cols = row[1], row[2]
+		local rowsig, cols = row[1], row[2]
 		local rowsig_str = rowsig.type .. ":" .. rowsig.name
 		local bitses = {}
 		for _, colsig in ipairs(cols) do
@@ -698,6 +699,9 @@ local function build_sparse_matrix(args)
 	end
 end
 
+---@param surface LuaSurface
+---@param bbox BoundingBox
+---@return LuaEntity[]
 local function find_children_in(surface, bbox)
 	local children = surface.find_entities_filtered({ area = bbox })
 	tlib.filter_in_place(
@@ -712,12 +716,19 @@ end
 ---@param surface LuaSurface
 ---@param bbox BoundingBox
 local function destroy_components_in(surface, bbox)
+	local n_destroyed = 0
 	local children = surface.find_entities_filtered({ area = bbox })
 	for i, child in ipairs(children) do
 		if string.find(child.name, "^recipe%-combinator%-component%-") then
 			child.destroy()
+			n_destroyed = n_destroyed + 1
 		end
 	end
+	strace.trace(
+		"lord-recipe-combinator: destroy_components_in: destroyed",
+		n_destroyed,
+		"child entities."
+	)
 end
 
 local function destroy_components(entity)
@@ -1248,9 +1259,8 @@ local function build_recipe_info_combinator(args)
 					or { type = "recipe", name = recipe.name }
 				local row =
 					matrix:create_or_add_row(sig, is_spoilage or not input_recipe)
-				local scaled_time = ceil(
-					(recipe.energy or 0) * (crafting_time_scale[recipe.category] or 0)
-				)
+				local scaled_time =
+					ceil((recipe.energy or 0) * (crafting_time_scale[category] or 0))
 				local ingredients = recipe.ingredients
 
 				-- Are all ingredients fluid?  If so, then the recipe does not accept quality
