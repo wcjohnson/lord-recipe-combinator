@@ -1,103 +1,152 @@
+local events = require("lib.core.event")
+local strace = require("lib.core.strace")
+local tlib = require("lib.core.table")
+local scheduler = require("lib.core.scheduler")
 
-local tagged_entity = require "lualib.tagged_entity"
-local event = require "lualib.event"
-local gui = require "lualib.gui"
-local circuit = require "lualib.circuit"
-local disable_picker_dollies = require "lualib.disable_picker_dollies"
-local myutil = require "lualib.util"
+local EMPTY = tlib.EMPTY
+strace.set_handler(strace.standard_log_handler)
+
+local gui = require("lualib.gui")
+local circuit = require("lualib.circuit")
+local disable_picker_dollies = require("lualib.disable_picker_dollies")
+local myutil = require("lualib.util")
 
 circuit.init()
 
-local function on_load()
-    tagged_entity.on_load()
-    disable_picker_dollies.disable_picker_dollies()
-end
-script.on_load(on_load)
-
-tagged_entity.tag_handlers["recipe-combinator-main"] = function(entity,tags)
-    if tags == nil then
-        tags = circuit.DEFAULT_ROLLUP
-        tagged_entity.set_tags(entity,tags)
-    end
-    circuit.rebuild_combinator(entity)
-end
-
-tagged_entity.paste_settings_handlers["recipe-combinator-main"] = function(ev)
-    local entity = ev.destination
-    if not entity then return end
-    local control = entity.get_or_create_control_behavior()
-    control.parameters = {operation="+"}
-end
-
-local function on_died(ev, mined_by_robot)
-    local entity = ev.entity or ev.ghost
-    -- TODO: save undo information so that we can rebuild it
-    if entity and entity.type ~= "entity-ghost"
-        and entity.name == "recipe-combinator-main"
-    then
-        circuit.destroy_components(entity)
-        -- Close players' windows
-        for _,player in pairs(game.players) do
-            if player.gui.screen[gui.WINDOW_ID] then
-                gui.close(ev.player_index, true)
-            end
-        end
-    end
-    tagged_entity.clear_tags(ev.entity)
-end
+events.bind(
+	"on_load",
+	function() disable_picker_dollies.disable_picker_dollies() end
+)
 
 local function on_gui_opened(ev)
-    if ev.gui_type ~= defines.gui_type.entity then return end
-    local entity = ev.entity
-    local player = game.get_player(ev.player_index)
-    if not player then return end
+	if ev.gui_type ~= defines.gui_type.entity then return end
+	local entity = ev.entity
+	local player = game.get_player(ev.player_index)
+	if not player then return end
 
-    -- Cribbed from Cybersyn combinator
-    if entity.valid and myutil.name_or_ghost_name(entity) == "recipe-combinator-main" then
-        gui.open(ev.player_index, entity)
-    elseif player.gui.screen[gui.WINDOW_ID] then
-        gui.close(ev.player_index)
-        return
-    end
+	-- Cribbed from Cybersyn combinator
+	if
+		entity.valid
+		and myutil.name_or_ghost_name(entity) == "recipe-combinator-main"
+	then
+		gui.open(ev.player_index, entity)
+	elseif player.gui.screen[gui.WINDOW_ID] then
+		gui.close(ev.player_index)
+		return
+	end
 end
 
 local function on_gui_closed(ev)
-    -- TODO: this only supports closing of one window; need to support sub-windows for pickers etc.
-    if not ev.element then return end
-    if ev.element.name ~= gui.WINDOW_ID then return end
-    local player = game.get_player(ev.player_index)
-    if not player then return end
-    if player.gui.screen[gui.WINDOW_ID] then
-        gui.close(ev.player_index)
-    end
+	-- TODO: this only supports closing of one window; need to support sub-windows for pickers etc.
+	if not ev.element then return end
+	if ev.element.name ~= gui.WINDOW_ID then return end
+	local player = game.get_player(ev.player_index)
+	if not player then return end
+	if player.gui.screen[gui.WINDOW_ID] then gui.close(ev.player_index) end
 end
 
-local function rebuild_limited_combinators(force)
-    for u,tags in pairs(tagged_entity.my_storage()) do
-        if tags["include_disabled"] == false then
-            local entity = game.get_entity_by_unit_number(u)
-            if entity then circuit.rebuild_combinator(entity) end
-        end
-    end
-    event.unregister_event(defines.events.on_tick, rebuild_limited_combinators)
+local function rebuild_all_combinators(force)
+	local _, things = remote.call(
+		"things-metadata-v1",
+		"get_things",
+		{ name = "recipe-combinator-main" }
+	) --[[@as nil, things.ThingShortSummary[] ]]
+	for _, thing in ipairs(things) do
+		if thing.entity and thing.entity.valid then
+			circuit.rebuild_combinator(thing.entity)
+		end
+	end
 end
 
-local register_event = event.register_event
-local function on_research_finished(ev)
-    register_event(defines.events.on_tick, rebuild_limited_combinators)
+scheduler.register_handler("rebuild_all_combinators", rebuild_all_combinators)
+
+local function schedule_rebuild_all_combinators(ev)
+	scheduler.after(1, "rebuild_all_combinators")
 end
 
-local filters = {{filter="name", name="recipe-combinator-main"}}
+events.bind(defines.events.on_gui_opened, on_gui_opened)
+events.bind(defines.events.on_gui_closed, on_gui_closed)
+events.bind(
+	defines.events.on_research_finished,
+	schedule_rebuild_all_combinators
+)
+events.bind(
+	defines.events.on_technology_effects_reset,
+	schedule_rebuild_all_combinators
+)
 
-register_event(defines.events.on_entity_died, on_died, filters)
-register_event(defines.events.on_space_platform_mined_entity, on_died, filters)
-register_event(defines.events.on_player_mined_entity, on_died, filters)
-register_event(defines.events.on_pre_ghost_deconstructed, on_died, filters)
-register_event(defines.events.on_robot_mined_entity, on_died, filters)
-register_event(defines.events.script_raised_destroy, on_died, filters)
+remote.add_interface("lord-recipe-combinator", {
+	initial_tags = function(entity) return circuit.DEFAULT_ROLLUP end,
+})
 
-register_event(defines.events.on_gui_opened, on_gui_opened)
-register_event(defines.events.on_gui_closed, on_gui_closed)
-register_event(defines.events.on_research_finished, on_research_finished)
-register_event(defines.events.on_technology_effects_reset, on_research_finished)
--- register_event(defines.events.on_player_rotated_entity, on_rotated)
+events.bind(
+	"lord-recipe-combinator-on_initialized",
+	---@param thing things.EventData.on_initialized
+	function(thing)
+		if thing.status == "real" then
+			circuit.rebuild_combinator(thing.entity --[[@as LuaEntity]])
+		end
+	end
+)
+
+---@param thing_id int64?
+local function destroy_children(thing_id)
+	if not thing_id then return end
+	local n_destroyed = 0
+	local _, children =
+		remote.call("things", "get_transient_data", thing_id, "children")
+	for i, child in ipairs(children or EMPTY) do
+		if child.valid then
+			child.destroy()
+			n_destroyed = n_destroyed + 1
+		end
+	end
+	strace.debug(
+		"lord-recipe-combinator.destroy_children destroyed",
+		n_destroyed,
+		"children of thing",
+		thing_id
+	)
+end
+
+local function close_windows()
+	-- Close players' windows
+	for _, player in pairs(game.players) do
+		if player.gui.screen[gui.WINDOW_ID] then gui.close(player.index, true) end
+	end
+end
+
+events.bind(
+	"lord-recipe-combinator-on_status",
+	---@param ev things.EventData.on_status
+	function(ev)
+		local old_status = ev.old_status
+		local new_status = ev.new_status
+
+		if new_status == "destroyed" then
+			destroy_children(ev.thing.id)
+			close_windows()
+			return
+		end
+
+		-- Unlink if void or ghosted
+		if new_status == "void" or new_status == "ghost" then
+			destroy_children(ev.thing.id)
+			close_windows()
+		end
+
+		-- Link if real
+		if new_status == "real" then
+			circuit.rebuild_combinator(ev.thing.entity --[[@as LuaEntity]])
+		end
+	end
+)
+
+events.bind(
+	"lord-recipe-combinator-on_tags_changed",
+	---@param ev things.EventData.on_tags_changed
+	function(ev)
+		local entity = ev.thing.entity
+		if entity and entity.valid then circuit.rebuild_combinator(entity) end
+	end
+)
