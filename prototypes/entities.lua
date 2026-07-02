@@ -1,5 +1,5 @@
 local util = require("__core__.lualib.util")
-local things_registration = require("__0-things__.registration")
+local things_registration = require("__0-things__.client.client") --[[@as things.client]]
 
 local empty_sheet = util.empty_sprite(1)
 local empty_sheet_4 = {
