@@ -8,7 +8,7 @@
   "description": "Special combinator to give information about items, fluids, receipes etc",
   "dependencies": [
     "flib >= 0.17.0",
-    "0-things >= 0.3.2",
+    "0-things >= 0.5.0",
     "! recipe_combinator"
   ]
 }

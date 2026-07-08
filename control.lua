@@ -101,11 +101,12 @@ local function destroy_children(thing_id)
 			n_destroyed = n_destroyed + 1
 		end
 	end
+	remote.call("things", "set_transient_data", thing_id, "children", nil)
 	strace.debug(
 		"lord-recipe-combinator.destroy_children destroyed",
 		n_destroyed,
 		"/",
-		#children,
+		#(children or EMPTY),
 		"children of thing",
 		thing_id
 	)
